@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan 1</title>
+    <!-- CDN Tailwindcss -->
+     <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen bg-gray-900 flex items-center justify-center">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <h2 class="text-3xl font-semibold text-center text-blue-600 mb-6">Login</h2>
+        <!-- Form Input -->
+        <form action="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+            <!-- Email -->
+            <div class="">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" name="email" id="email" required placeholder="isi email anda" class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+            </div>
+
+            <!-- Password -->
+            <div class="">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" id="password" required placeholder="masukkan password anda" class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+            </div>
+
+            <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                Login
+            </button>
+        </form>
+    </div>
+
+    <!-- Javascript -->
+    <script>
+        function handleLogin(event){
+            event.preventDefault();
+
+            if(email && password) {
+                alert("login anda berhasil")
+            } else {
+                alert("login anda gagal")
+            }   
+        }
+    </script>
+</body>
+</html>
