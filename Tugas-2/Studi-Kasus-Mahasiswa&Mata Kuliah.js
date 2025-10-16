@@ -17,7 +17,7 @@ class Mahasiswa {
         console.log(`Nilai Tugas: ${this.nilaiTugas}, UTS ${this.nilaiUTS}, UAS ${this.nilaiUAS}`)
         console.log(`Total Nilai: ${this.totalNilai()}`)
         console.log(`Kategori Nilai: ${this.kategoriNilai()}`)
-        console.log(`IPS: ${this.IPS().toFixed(2)}`)
+        console.log(`IPS: ${this.IPS().toFixed(2)} \n`)
     }
 
     // Menambah Mahasiswa Baru
@@ -128,9 +128,10 @@ class ListMahasiswa {
     }
 }
 
+// Main Program
 const list = new ListMahasiswa();
 
-const mhs1 = new Mahasiswa("A11.2023.11111", "Dhion", true, 99, 95, 100)
+const mhs1 = new Mahasiswa("A11.2023.11111", "Dhion", true, 99, 95, 100,)
 const mhs2 = new Mahasiswa("A11.2023.22222", "Dio", false, 85, 100, 80)
 const mhs3 = new Mahasiswa("A11.2023.12345", "Randy", true, 90, 80, 80)
 
@@ -142,7 +143,7 @@ console.log("Semua Data Mahasiswa")
 list.showAll();
 
 console.log("Jumlah Mahasiswa: ", list.jumlahMahasiswa());
-console.log("Jumlah Aktif/Tidak Aktif: ", list.jumlahAktifTidak());
+console.log("Jumlah Aktif/Tidak Aktif: ", list.jumlahAktifTidak(),);
 
 list.sortByNim();
 list.sortByStatus();
