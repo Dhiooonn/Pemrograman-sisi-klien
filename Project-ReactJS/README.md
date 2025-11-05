@@ -33,6 +33,7 @@ Berdasarkan struktur folder, aplikasi ini memiliki fitur-fitur berikut:
 
 ## 📁 Struktur Proyek
 
+```bash
 PROJECT-REACTJS/
 ├── .gitignore
 ├── eslint.config.js
@@ -47,11 +48,13 @@ PROJECT-REACTJS/
     ├── App.css
     ├── App.jsx
     ├── main.jsx
+    │
     ├── Data/
     │   └── Dummy.js
+    │
     ├── Pages/
     │   ├── Admin/
-    │   │   ├── Components/     # Komponen khusus Admin
+    │   │   ├── Components/          # Komponen khusus Admin
     │   │   │   ├── Button.jsx
     │   │   │   ├── Card.jsx
     │   │   │   ├── Footer.jsx
@@ -63,26 +66,35 @@ PROJECT-REACTJS/
     │   │   │   ├── Link.jsx
     │   │   │   ├── ProtectedRoute.jsx
     │   │   │   └── Sidebar.jsx
-    │   │   ├── Dashboard/        # Halaman Dashboard
+    │   │   │
+    │   │   ├── Dashboard/           # Halaman Dashboard
     │   │   │   └── Dashboard.jsx
-    │   │   ├── Mahasiswa/        # Fitur Manajemen Mahasiswa
+    │   │   │
+    │   │   ├── Mahasiswa/           # Fitur Manajemen Mahasiswa
     │   │   │   ├── Mahasiswa.jsx
     │   │   │   ├── ModalMahasiswa.jsx
     │   │   │   └── TableMahasiswa.jsx
-    │   │   ├── MahasiswaDetail/  # Halaman Detail Mahasiswa
+    │   │   │
+    │   │   ├── MahasiswaDetail/     # Halaman Detail Mahasiswa
     │   │   │   └── MahasiswaDetail.jsx
-    │   │   └── AdminLayout.jsx   # Layout utama untuk Admin
+    │   │   │
+    │   │   └── AdminLayout.jsx      # Layout utama untuk Admin
+    │   │
     │   ├── Auth/
     │   │   ├── Login/
     │   │   │   └── Login.jsx
-    │   │   └── AuthLayout.jsx    # Layout untuk halaman Autentikasi
+    │   │   └── AuthLayout.jsx       # Layout untuk halaman Autentikasi
+    │   │
     │   ├── Error/
-    │   │   └── PageNotFound.jsx  # Halaman 404
-    │   └── Home.jsx              # Halaman beranda publik
+    │   │   └── PageNotFound.jsx     # Halaman 404
+    │   │
+    │   └── Home.jsx                 # Halaman beranda publik
+    │
     └── Utils/
         └── Helpers/
-            ├── SwalHelpers.jsx
-            └── ToastHelpers.jsx
+            ├── SwalHelpers.jsx      # Helper untuk SweetAlert
+            └── ToastHelpers.jsx     # Helper untuk Toast Notification
+
 
 ---
 
