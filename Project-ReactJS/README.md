@@ -103,10 +103,11 @@ PROJECT-REACTJS/
 
 2. Instal dependensi:
 
-    ``npm install``
+    ```bash
+    npm install
 
 3. Jalankan server pengembangan: Proyek ini menggunakan Vite, jadi jalankan:
-
-    ``npm run dev``
+    ```bash
+    npm run dev
 
 4. Buka http://localhost:5173 (atau port lain yang ditampilkan di terminal) di browser Anda.
