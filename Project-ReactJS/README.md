@@ -98,8 +98,8 @@ PROJECT-REACTJS/
 ## ⚙️ Cara Menjalankan Proyek
 
 1. Clone repository ini:
-
-   ``git clone https://github.com/username/dashboard-mahasiswa.git``
+   ```bash
+   git clone https://github.com/username/dashboard-mahasiswa.git
 
 2. Instal dependensi:
 
