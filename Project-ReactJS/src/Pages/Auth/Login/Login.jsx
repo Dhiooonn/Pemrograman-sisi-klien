@@ -1,16 +1,18 @@
 import React from "react";
-import Input from "@/Layouts/Components/Input";
-import Label from "@/Layouts/Components/Label";
-import Button from "@/Layouts/Components/Button";
-import Link from "@/Layouts/Components/Link";
-import Card from "@/Layouts/Components/Card";
-import Heading from "@/Layouts/Components/Heading";
-import Form from "@/Layouts/Components/Form";
-import AuthLayout from "@/Layouts/AuthLayout";
+import Input from "@/Pages/Admin/Components/Input";
+import Label from "@/Pages/Admin/Components/Label";
+import Button from "@/Pages/Admin/Components/Button";
+import Link from "@/Pages/Admin/Components/Link";
+import Card from "@/Pages/Admin/Components/Card";
+import Heading from "@/Pages/Admin/Components/Heading";
+import Form from "@/Pages/Admin/Components/Form";
 
 import { dummyUser } from "@/Data/Dummy";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -18,7 +20,7 @@ const Login = () => {
 
     if (email === dummyUser.email && password === dummyUser.password) {
       localStorage.setItem("user", JSON.stringify(dummyUser));
-      window.location.href = "/admin";
+      navigate("/admin")
     } else {
       alert("Email atau password salah!");
     }

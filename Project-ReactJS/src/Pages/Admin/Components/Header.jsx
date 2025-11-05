@@ -1,10 +1,26 @@
-import Button from "@/Layouts/Components/Button";
+import {
+  confirmLogout,
+} from "@/Utils/Helpers/SwalHelpers";
+import { Navigate, useNavigate } from "react-router-dom";
+
+import { toastSuccess } from "@/Utils/Helpers/ToastHelpers";
+
+import Button from "@/Pages/Admin/Components/Button";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const toggleProfileMenu = () => {
     const menu = document.getElementById("profileMenu");
     if (menu) menu.classList.toggle("hidden");
   };
+
+  const handleLogout = () => {
+    confirmLogout(() => {
+      localStorage.removeItem("user");
+      navigate("/")
+    });
+  }
 
   return (
     <header className="bg-white shadow-md">
@@ -24,8 +40,7 @@ const Header = () => {
             </a>
             <button
               onClick={() => {
-                localStorage.removeItem("user");
-                location.href = "/";
+                handleLogout();
               }}
               className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
