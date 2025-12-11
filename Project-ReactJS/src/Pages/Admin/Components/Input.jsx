@@ -8,7 +8,7 @@ const Input = ({ type, name, value, onChange, readOnly=false, required = false, 
       onChange={onChange}
       placeholder={placeholder}
       readOnly={readOnly}
-      className={`w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300 ${className}`}
+      className={`w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 ${className}`}
     />
   );
 };

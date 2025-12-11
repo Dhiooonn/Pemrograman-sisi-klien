@@ -1,0 +1,32 @@
+// //  create API login via GET (search user)
+// import axios from "@/Utils/AxiosInstance"
+
+// export const login = async ( email, password ) => {
+//     const res = await axios.get("/user", { params: {email} });
+//     const user = res.data[0];
+
+//     if (!user) throw new Error("Email tidak ditemukan");
+//     if (!password !== password) throw new Error("Password salah");
+
+//     return user;
+// };
+
+// AuthApi.js
+import axios from "@/Utils/AxiosInstance";
+
+export const login = async (email, password) => {
+  // Cari user berdasarkan email
+  const res = await axios.get("/user", { params: { email } });
+  const user = res.data[0];
+
+  if (!user) {
+    throw new Error("Email tidak ditemukan");
+  }
+
+  // Compare password dari database JSON Server
+  if (user.password !== password) {
+    throw new Error("Password salah");
+  }
+
+  return user;
+};

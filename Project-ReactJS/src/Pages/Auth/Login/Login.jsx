@@ -9,20 +9,44 @@ import Form from "@/Pages/Admin/Components/Form";
 
 import { dummyUser } from "@/Data/Dummy";
 import { useNavigate } from "react-router-dom";
+import { login } from "@/utils/Apis/AuthApi";
 
 const Login = () => {
     const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    // State Form
+    const [ form, setForm ] = React.useState({
+      email: "",
+      password: "",
+    })
 
-    if (email === dummyUser.email && password === dummyUser.password) {
-      localStorage.setItem("user", JSON.stringify(dummyUser));
-      navigate("/admin")
-    } else {
-      alert("Email atau password salah!");
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const email = e.target.email.value;
+  //   const password = e.target.password.value;
+
+  //   if (email === dummyUser.email && password === dummyUser.password) {
+  //     localStorage.setItem("user", JSON.stringify(dummyUser));
+  //     navigate("/admin")
+  //   } else {
+  //     alert("Email atau password salah!");
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = form;
+
+    try {
+      const user = await login(email, password);
+
+      // Simpan user
+      localStorage.setItem("user", JSON.stringify(user.data ?? user));
+
+      alert("Login berhasil!");
+      navigate("/admin/dashboard");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login gagal, silakan coba lagi.");
     }
   };
 
@@ -32,11 +56,23 @@ const Login = () => {
         <Form onSubmit={handleSubmit}>
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input type="email" name="email" placeholder="Masukkan email" required />
+            <Input 
+              type="email" 
+              name="email" 
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="Masukkan email" 
+              required />
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input type="password" name="password" placeholder="Masukkan password" required />
+              <Input 
+              type="password" 
+              name="password" 
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="Masukkan password" 
+              required />
           </div>
           <div className="flex justify-between items-center">
             <label className="flex items-center">
