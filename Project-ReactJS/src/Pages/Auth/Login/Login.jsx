@@ -7,9 +7,13 @@ import Card from "@/Pages/Admin/Components/Card";
 import Heading from "@/Pages/Admin/Components/Heading";
 import Form from "@/Pages/Admin/Components/Form";
 
+import Swal from "sweetalert2";
+import { toast } from "react-hot-toast"
+
 import { dummyUser } from "@/Data/Dummy";
 import { useNavigate } from "react-router-dom";
 import { login } from "@/utils/Apis/AuthApi";
+
 
 const Login = () => {
     const navigate = useNavigate();
@@ -43,10 +47,13 @@ const Login = () => {
       // Simpan user
       localStorage.setItem("user", JSON.stringify(user.data ?? user));
 
-      alert("Login berhasil!");
+      // Toast Success
+      toast.success("Login Berhasil!, Selamat datang 👋");
+
       navigate("/admin/dashboard");
     } catch (err) {
-      alert(err.response?.data?.message || "Login gagal, silakan coba lagi.");
+      // Toast error
+      toast.error(err.response?.data?.message || "Login Gagal! Coba lagi ya");
     }
   };
 
