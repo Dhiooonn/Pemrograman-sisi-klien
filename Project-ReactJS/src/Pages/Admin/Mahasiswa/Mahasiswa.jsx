@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 
 import {
   getAllMahasiswa,
@@ -16,9 +17,11 @@ import Heading from "@/Pages/Admin/Components/Heading";
 import Button from "@/Pages/Admin/Components/Button";
 import TableMahasiswa from "./TableMahasiswa";
 import ModalMahasiswa from "./ModalMahasiswa";
+import { useAuthStateContext } from "../../Auth/Context/AuthContext";
 
 const Mahasiswa = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStateContext();
 
   const [mahasiswa, setMahasiswa] = useState([]);
   const [form, setForm] = useState({ nim: "", nama: "" });
@@ -29,7 +32,7 @@ const Mahasiswa = () => {
   const fetchMahasiswa = async () => {
   try {
     const res = await getAllMahasiswa();
-    console.log("DATA API:", res.data); // DEBUG
+    // console.log("DATA API:", res.data); // DEBUG
     setMahasiswa(res.data);
   } catch (err) {
     toastError("Gagal mengambil data mahasiswa");
@@ -96,7 +99,7 @@ const Mahasiswa = () => {
     });
   } else {
     try {
-      await storeMahasiswa({ nim: form.nim, nama: form.nama }); // ← id DIHAPUS
+      await storeMahasiswa({ nim: form.nim, nama: form.nama });
       toastSuccess("Data berhasil ditambahkan");
       setIsModalOpen(false);
       fetchMahasiswa();
@@ -122,16 +125,30 @@ const Mahasiswa = () => {
           <Heading as="h2" className="mb-0 text-left">
             Daftar Mahasiswa
           </Heading>
-          <Button onClick={openAddModal}>+ Tambah Mahasiswa</Button>
+
+          {/* Button Create  (TAMBAH) */}
+          {user?.permission?.includes("mahasiswa.create") && (
+              <Button onClick={openAddModal}>+ Tambah Mahasiswa</Button>
+          )}
         </div>
 
-        <TableMahasiswa
-          data={mahasiswa}
-          onEdit={openEditModal}
-          onDelete={handleDelete}
-          onDetail={(id) => navigate(`/admin/mahasiswa/${id}`)}
-        />
+        {/* Table Mahasiswa (READ) */}
+        {user?.permission?.includes("mahasiswa.read") ? (
+          <TableMahasiswa
+            data={mahasiswa}
+            onEdit={openEditModal}
+            onDelete={handleDelete}
+            onDetail={(id) => navigate(`/admin/mahasiswa/${id}`)}
+          />
+        ) : (
+          <p className="text-gray-500 text-sm">
+            Anda tidak memiliki izin untuk melihat data mahasiswa.
+          </p>
+        )}
       </Card>
+
+      {/* Detail Mahasiswa */}
+      <Outlet />
 
       <ModalMahasiswa
         isOpen={isModalOpen}

@@ -1,14 +1,14 @@
 import {
   confirmLogout,
 } from "@/Utils/Helpers/SwalHelpers";
-import { Navigate, useNavigate } from "react-router-dom";
-
-import { toastSuccess } from "@/Utils/Helpers/ToastHelpers";
+import { useNavigate } from "react-router-dom";
 
 import Button from "@/Pages/Admin/Components/Button";
+import { useAuthStateContext } from "../../Auth/Context/AuthContext";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { setUser } = useAuthStateContext();
 
   const toggleProfileMenu = () => {
     const menu = document.getElementById("profileMenu");
@@ -17,8 +17,9 @@ const Header = () => {
 
   const handleLogout = () => {
     confirmLogout(() => {
-      localStorage.removeItem("user");
-      navigate("/")
+      // localStorage.removeItem("user");
+      setUser(null);
+      navigate("/", { replace: true });
     });
   }
 

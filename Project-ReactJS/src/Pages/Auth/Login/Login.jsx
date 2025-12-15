@@ -7,53 +7,43 @@ import Card from "@/Pages/Admin/Components/Card";
 import Heading from "@/Pages/Admin/Components/Heading";
 import Form from "@/Pages/Admin/Components/Form";
 
-import Swal from "sweetalert2";
-import { toast } from "react-hot-toast"
+import { toast } from "react-hot-toast";
+import { useNavigate, Navigate } from "react-router-dom";
 
-import { dummyUser } from "@/Data/Dummy";
-import { useNavigate } from "react-router-dom";
 import { login } from "@/utils/Apis/AuthApi";
-
+import { useAuthStateContext } from "../Context/AuthContext";
 
 const Login = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { user, setUser } = useAuthStateContext();
 
-    // State Form
-    const [ form, setForm ] = React.useState({
-      email: "",
-      password: "",
-    })
+  const [form, setForm] = React.useState({
+    email: "",
+    password: "",
+  });
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   const email = e.target.email.value;
-  //   const password = e.target.password.value;
-
-  //   if (email === dummyUser.email && password === dummyUser.password) {
-  //     localStorage.setItem("user", JSON.stringify(dummyUser));
-  //     navigate("/admin")
-  //   } else {
-  //     alert("Email atau password salah!");
-  //   }
-  // };
+  // Jika sudah login, tidak boleh buka halaman login
+  if (user) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = form;
 
     try {
-      const user = await login(email, password);
+      const res = await login(form.email, form.password);
 
-      // Simpan user
-      localStorage.setItem("user", JSON.stringify(user.data ?? user));
+      // json-server biasanya mengembalikan array
+      const loggedUser = res.data?.[0] ?? res.data ?? res;
 
-      // Toast Success
-      toast.success("Login Berhasil!, Selamat datang 👋");
+      // SIMPAN LEWAT CONTEXT
+      setUser(loggedUser);
+
+      toast.success("Login berhasil! 👋");
 
       navigate("/admin/dashboard");
     } catch (err) {
-      // Toast error
-      toast.error(err.response?.data?.message || "Login Gagal! Coba lagi ya");
+      toast.error("Login gagal! Email atau password salah");
     }
   };
 

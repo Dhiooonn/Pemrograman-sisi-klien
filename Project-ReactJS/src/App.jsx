@@ -13,6 +13,7 @@ import AdminLayout from './Pages/Admin/AdminLayout'
 import Mahasiswa from './Pages/Admin/Mahasiswa/Mahasiswa.jsx'
 import MahasiswaDetail from './Pages/Admin/MahasiswaDetail/MahasiswaDetail.jsx'
 import ProtectedRoute from './Pages/Admin/Components/ProtectedRoute.jsx';
+import { AuthProvider } from './Pages/Auth/Context/AuthContext.jsx';
 
 const router =  createBrowserRouter([
   {
@@ -57,7 +58,7 @@ const router =  createBrowserRouter([
             element: <Mahasiswa />
           },
           {
-            path: ":nim",
+            path: ":id",
             element: <MahasiswaDetail />
           }
         ]
@@ -71,8 +72,8 @@ const router =  createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <AuthProvider>
     <Toaster position="top-right" />
     <RouterProvider router={router} />
-  </StrictMode>,
+  </AuthProvider>,
 )
