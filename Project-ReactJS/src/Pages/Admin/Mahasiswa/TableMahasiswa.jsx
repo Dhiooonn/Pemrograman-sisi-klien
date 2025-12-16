@@ -2,10 +2,10 @@ import Button from "@/Pages/Admin/Components/Button";
 import { useAuthStateContext } from "../../Auth/Context/AuthContext";
 
 const TableMahasiswa = ({ data = [], onEdit, onDelete, onDetail }) => {
-  const { user } = useAuthStateContext
+  const { user } = useAuthStateContext();
 
   // helper permission
-  const can = (permissions) => user.permissions.includes(permissions)
+  const can = (permission) => user?.permission?.includes(permission)
   return (
     <table className="w-full text-sm text-gray-700">
       <thead className="bg-blue-600 text-white">

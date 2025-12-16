@@ -11,7 +11,7 @@
       "mahasiswa.read",
       "mahasiswa.create",
       "mahasiswa.update",
-      "mahasiswa.delete"
+      "mahasiswa.delete" 
     ]
   },
   {
