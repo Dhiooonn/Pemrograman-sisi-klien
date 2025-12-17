@@ -48,7 +48,7 @@ const TableMahasiswa = ({ data = [], onEdit, onDelete, onDetail }) => {
             } hover:bg-blue-50 transition-colors duration-200`}
           >
             <td className="py-2 px-4">{mhs.nim}</td>
-            <td className="py-2 px-4">{mhs.nama}</td>
+            <td className="py-2 px-4">{mhs.name}</td>
 
             <td className="py-2 px-4 text-center space-x-2">
               

@@ -58,13 +58,13 @@ const ModalMahasiswa = ({
 
           {/* Input Nama */}
           <div>
-            <Label htmlFor="nama" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700">
               Nama
             </Label>
             <Input
               type="text"
-              name="nama"
-              value={form.nama}
+              name="name"
+              value={form.name}
               onChange={onChange}
               placeholder="Masukkan Nama"
               className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"

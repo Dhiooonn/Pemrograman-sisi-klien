@@ -22,7 +22,8 @@
     "role": "mahasiswa",
     "permission": [
       "krs.page",
-      "krs.read"
+      "krs.read",
+      "rencana-studi.page"
     ]
   }
 ]
