@@ -168,7 +168,8 @@
       "mata_kuliah_id": "2",
       "dosen_id": "3",
       "mahasiswa_ids": [
-        17
+        17,
+        "17"
       ],
       "id": 2
     }

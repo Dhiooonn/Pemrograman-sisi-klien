@@ -2,10 +2,10 @@ import Button from "@/Pages/Admin/Components/Button";
 import Select from "@/Pages/Admin/Components/Select";
 
 export default function TableRencanaStudi({
-  kelas = [],
-  mahasiswa = [],
-  dosen = [],
-  mataKuliah = [],
+  kelas,
+  mahasiswa,
+  dosen,
+  mataKuliah,
   selectedMhs,
   setSelectedMhs,
   selectedDsn,
@@ -15,12 +15,13 @@ export default function TableRencanaStudi({
   handleChangeDosen,
   handleDeleteKelas,
 }) {
-  if (kelas.length === 0)
+  if (kelas.length === 0) {
     return (
-      <p className="text-sm text-gray-500 italic">
+      <p className="text-sm italic text-gray-500">
         Belum ada kelas tersedia
       </p>
     );
+  }
 
   return (
     <div className="space-y-6">
@@ -31,155 +32,161 @@ export default function TableRencanaStudi({
         const dosenPengampu = dosen.find(
           (d) => d.id === kls.dosen_id
         );
-        const mhsInClass = (kls.mahasiswa_ids || [])
+        const mhsInClass = kls.mahasiswa_ids
           .map((id) => mahasiswa.find((m) => m.id === id))
           .filter(Boolean);
 
         return (
-          <div
-            key={kls.id}
-            className="rounded-lg bg-white shadow-sm overflow-hidden"
-          >
-            {/* HEADER + ACTION */}
-            <div className="px-4 py-4 bg-gray-50 border-b space-y-3">
-              
-              {/* Info Matkul + Dosen */}
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-semibold text-gray-800">
-                    {matkul?.name}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Dosen: <strong>{dosenPengampu?.name}</strong>
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <Select
-                    size="sm"
-                    value={selectedDsn[kls.id] || ""}
-                    onChange={(e) =>
-                      setSelectedDsn({
-                        ...selectedDsn,
-                        [kls.id]: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Ganti Dosen</option>
-                    {dosen.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
-                      </option>
-                    ))}
-                  </Select>
-
-                  <Button
-                    size="sm"
-                    onClick={() => handleChangeDosen(kls)}
-                  >
-                    Simpan
-                  </Button>
-
-                  {mhsInClass.length === 0 && (
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() =>
-                        handleDeleteKelas(kls.id)
-                      }
-                    >
-                      Hapus
-                    </Button>
-                  )}
-                </div>
+          <div key={kls.id} className="rounded-lg bg-white shadow">
+            {/* HEADER */}
+            <div className="flex justify-between items-center px-4 py-3 border-b bg-gray-50">
+              <div>
+                <h3 className="text-lg font-semibold">
+                  {matkul?.name || "-"}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Dosen: <strong>{dosenPengampu?.name || "-"}</strong>
+                </p>
               </div>
 
-              {/* Tambah Mahasiswa (PINDAH KE ATAS) */}
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex gap-2">
                 <Select
                   size="sm"
-                  value={selectedMhs[kls.id] || ""}
+                  className="w-48"
+                  value={selectedDsn[kls.id] || ""}
                   onChange={(e) =>
-                    setSelectedMhs({
-                      ...selectedMhs,
-                      [kls.id]: Number(e.target.value),
+                    setSelectedDsn({
+                      ...selectedDsn,
+                      [kls.id]: e.target.value,
                     })
                   }
-                  className="flex-1"
                 >
-                  <option value="">Pilih Mahasiswa</option>
-                  {mahasiswa.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
+                  <option value="">-- Ganti Dosen --</option>
+                  {dosen.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
                     </option>
                   ))}
                 </Select>
 
                 <Button
                   size="sm"
-                  onClick={() =>
-                    handleAddMahasiswa(
-                      kls,
-                      selectedMhs[kls.id]
-                    )
-                  }
+                  onClick={() => handleChangeDosen(kls)}
                 >
-                  Tambah
+                  Simpan
                 </Button>
+
+                {mhsInClass.length === 0 && (
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => handleDeleteKelas(kls.id)}
+                  >
+                    Hapus Kelas
+                  </Button>
+                )}
               </div>
             </div>
 
-            {/* TABLE MAHASISWA */}
-            <table className="w-full text-sm text-gray-700">
+            {/* TABLE */}
+            <table className="w-full text-sm">
               <thead className="bg-blue-600 text-white">
                 <tr>
+                  <th className="py-2 px-4">No</th>
                   <th className="py-2 px-4 text-left">Nama</th>
                   <th className="py-2 px-4 text-left">NIM</th>
+                  <th className="py-2 px-4 text-center">Total SKS</th>
                   <th className="py-2 px-4 text-center">Aksi</th>
                 </tr>
               </thead>
 
               <tbody>
-                {mhsInClass.length === 0 && (
+                {mhsInClass.length > 0 ? (
+                  mhsInClass.map((m, i) => {
+                    const totalSks = kelas
+                      .filter((k) =>
+                        k.mahasiswa_ids.includes(m.id)
+                      )
+                      .map(
+                        (k) =>
+                          mataKuliah.find(
+                            (mk) => mk.id === k.mata_kuliah_id
+                          )?.sks || 0
+                      )
+                      .reduce((a, b) => a + b, 0);
+
+                    return (
+                      <tr
+                        key={m.id}
+                        className={
+                          i % 2 === 0
+                            ? "bg-white"
+                            : "bg-gray-100"
+                        }
+                      >
+                        <td className="py-2 px-4">{i + 1}</td>
+                        <td className="py-2 px-4">{m.name}</td>
+                        <td className="py-2 px-4">{m.nim}</td>
+                        <td className="py-2 px-4 text-center">
+                          {totalSks}
+                        </td>
+                        <td className="py-2 px-4 text-center">
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() =>
+                              handleDeleteMahasiswa(kls, m.id)
+                            }
+                          >
+                            Hapus
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
                   <tr>
                     <td
-                      colSpan="3"
-                      className="py-4 text-center text-gray-500"
+                      colSpan="5"
+                      className="py-3 text-center italic text-gray-500"
                     >
                       Belum ada mahasiswa
                     </td>
                   </tr>
                 )}
-
-                {mhsInClass.map((m, index) => (
-                  <tr
-                    key={m.id}
-                    className={`${
-                      index % 2 === 0
-                        ? "bg-white"
-                        : "bg-gray-100"
-                    } hover:bg-blue-50 transition-colors duration-200`}
-                  >
-                    <td className="py-2 px-4">{m.name}</td>
-                    <td className="py-2 px-4">{m.nim}</td>
-                    <td className="py-2 px-4 text-center">
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onClick={() =>
-                          handleDeleteMahasiswa(
-                            kls,
-                            m.id
-                          )
-                        }
-                      >
-                        Hapus
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             </table>
+
+            {/* ADD MAHASISWA */}
+            <div className="flex items-center gap-2 px-4 py-3 border-t bg-gray-50">
+              <Select
+                size="sm"
+                className="w-56"
+                value={selectedMhs[kls.id] || ""}
+                onChange={(e) =>
+                  setSelectedMhs({
+                    ...selectedMhs,
+                    [kls.id]: e.target.value,
+                  })
+                }
+              >
+                <option value="">-- Pilih Mahasiswa --</option>
+                {mahasiswa.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} ({m.nim})
+                  </option>
+                ))}
+              </Select>
+
+              <Button
+                size="sm"
+                onClick={() =>
+                  handleAddMahasiswa(kls, selectedMhs[kls.id])
+                }
+              >
+                Tambah Mahasiswa
+              </Button>
+            </div>
           </div>
         );
       })}

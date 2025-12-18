@@ -22,6 +22,7 @@ import { toastError, toastSuccess } from "@/Utils/Helpers/ToastHelpers";
 import { confirmDelete } from "@/Utils/Helpers/SwalHelpers";
 
 const RencanaStudi = () => {
+  /* ================= STATE & DATA ================= */
   const { user } = useAuthStateContext();
 
   const [kelas, setKelas] = useState([]);
@@ -34,12 +35,13 @@ const RencanaStudi = () => {
   const [form, setForm] = useState({ mata_kuliah_id: "", dosen_id: "" });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  /* ================= FETCH DATA ================= */
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const [resKelas, resDosen, resMahasiswa, resMatkul] =
+    const [resKelas, resDosen, resMahasiswa, resMataKuliah] =
       await Promise.all([
         getAllKelas(),
         getAllDosen(),
@@ -50,96 +52,125 @@ const RencanaStudi = () => {
     setKelas(resKelas.data);
     setDosen(resDosen.data);
     setMahasiswa(resMahasiswa.data);
-    setMataKuliah(resMatkul.data);
+    setMataKuliah(resMataKuliah.data);
   };
 
-  const getMaxSksMahasiswa = (id) =>
+  /* ================= FILTER MATKUL ================= */
+  const mataKuliahSudahDipakai = kelas.map((k) => k.mata_kuliah_id);
+  const mataKuliahBelumAdaKelas = mataKuliah.filter(
+    (m) => !mataKuliahSudahDipakai.includes(m.id)
+  );
+
+  /* ================= UTIL SKS ================= */
+  const getMaxSks = (id) =>
     mahasiswa.find((m) => m.id === id)?.max_sks || 0;
 
-  const getMaxSksDosen = (id) =>
+  const getDosenMaxSks = (id) =>
     dosen.find((d) => d.id === id)?.max_sks || 0;
 
-  const handleAddMahasiswa = async (kls, mhsId) => {
+  /* ================= HANDLER ================= */
+  const handleAddMahasiswa = async (kelasItem, mhsId) => {
     if (!mhsId) return;
 
-    const sksMatkul =
-      mataKuliah.find((m) => m.id === kls.mata_kuliah_id)?.sks || 0;
+    const sks =
+      mataKuliah.find((m) => m.id === kelasItem.mata_kuliah_id)?.sks || 0;
 
-    const totalSks = kelas
+    const totalSksMahasiswa = kelas
       .filter((k) => k.mahasiswa_ids.includes(mhsId))
-      .reduce(
-        (sum, k) =>
-          sum +
-          (mataKuliah.find((m) => m.id === k.mata_kuliah_id)?.sks || 0),
-        0
-      );
+      .map(
+        (k) =>
+          mataKuliah.find((m) => m.id === k.mata_kuliah_id)?.sks || 0
+      )
+      .reduce((a, b) => a + b, 0);
 
-    if (totalSks + sksMatkul > getMaxSksMahasiswa(mhsId)) {
-      toastError("SKS mahasiswa melebihi batas");
+    const maxSks = getMaxSks(mhsId);
+
+    if (totalSksMahasiswa + sks > maxSks) {
+      toastError(`SKS melebihi batas maksimal (${maxSks})`);
       return;
     }
 
-    if (kls.mahasiswa_ids.includes(mhsId)) {
+    if (kelasItem.mahasiswa_ids.includes(mhsId)) {
       toastError("Mahasiswa sudah terdaftar");
       return;
     }
 
-    await updateKelas(kls.id, {
-      ...kls,
-      mahasiswa_ids: [...kls.mahasiswa_ids, mhsId],
+    await updateKelas(kelasItem.id, {
+      ...kelasItem,
+      mahasiswa_ids: [...kelasItem.mahasiswa_ids, mhsId],
     });
 
     toastSuccess("Mahasiswa ditambahkan");
-    setSelectedMhs((prev) => ({ ...prev, [kls.id]: "" }));
+    setSelectedMhs((prev) => ({ ...prev, [kelasItem.id]: "" }));
     fetchData();
   };
 
-  const handleDeleteMahasiswa = async (kls, mhsId) => {
-    await updateKelas(kls.id, {
-      ...kls,
-      mahasiswa_ids: kls.mahasiswa_ids.filter((id) => id !== mhsId),
+  const handleDeleteMahasiswa = async (kelasItem, mhsId) => {
+    await updateKelas(kelasItem.id, {
+      ...kelasItem,
+      mahasiswa_ids: kelasItem.mahasiswa_ids.filter(
+        (id) => id !== mhsId
+      ),
     });
+
     toastSuccess("Mahasiswa dihapus");
     fetchData();
   };
 
-  const handleChangeDosen = async (kls) => {
-    const dsnId = selectedDsn[kls.id];
+  const handleChangeDosen = async (kelasItem) => {
+    const dsnId = selectedDsn[kelasItem.id];
     if (!dsnId) return;
 
-    const kelasSks =
-      mataKuliah.find((m) => m.id === kls.mata_kuliah_id)?.sks || 0;
-
-    const totalSks = kelas
+    const totalSksDosen = kelas
       .filter((k) => k.dosen_id === dsnId)
-      .reduce(
-        (sum, k) =>
-          sum +
-          (mataKuliah.find((m) => m.id === k.mata_kuliah_id)?.sks || 0),
-        0
-      );
+      .map(
+        (k) =>
+          mataKuliah.find((m) => m.id === k.mata_kuliah_id)?.sks || 0
+      )
+      .reduce((a, b) => a + b, 0);
 
-    if (totalSks + kelasSks > getMaxSksDosen(dsnId)) {
-      toastError("SKS dosen melebihi batas");
+    const kelasSks =
+      mataKuliah.find((m) => m.id === kelasItem.mata_kuliah_id)?.sks || 0;
+
+    const maxSks = getDosenMaxSks(dsnId);
+
+    if (totalSksDosen + kelasSks > maxSks) {
+      toastError(`Dosen melebihi batas maksimal SKS (${maxSks})`);
       return;
     }
 
-    await updateKelas(kls.id, { ...kls, dosen_id: dsnId });
+    await updateKelas(kelasItem.id, {
+      ...kelasItem,
+      dosen_id: dsnId,
+    });
+
     toastSuccess("Dosen diperbarui");
     fetchData();
   };
 
-  const handleDeleteKelas = (id) => {
+  const handleDeleteKelas = (kelasId) => {
     confirmDelete(async () => {
-      await deleteKelas(id);
+      await deleteKelas(kelasId);
       toastSuccess("Kelas dihapus");
       fetchData();
     });
   };
 
-  const handleSubmit = async () => {
+  /* ================= MODAL ================= */
+  const openAddModal = () => {
+    setForm({ mata_kuliah_id: "", dosen_id: "" });
+    setIsModalOpen(true);
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!form.mata_kuliah_id || !form.dosen_id) {
-      toastError("Form belum lengkap");
+      toastError("Form tidak lengkap");
       return;
     }
 
@@ -149,18 +180,15 @@ const RencanaStudi = () => {
     fetchData();
   };
 
-  const mataKuliahBelumAdaKelas = mataKuliah.filter(
-    (m) => !kelas.map((k) => k.mata_kuliah_id).includes(m.id)
-  );
-
+  /* ================= RENDER ================= */
   return (
     <>
       <Card>
         <div className="flex justify-between items-center mb-4">
           <Heading as="h2">Rencana Studi</Heading>
 
-          {user?.permission?.includes("rencana-studi.create") && (
-            <Button onClick={() => setIsModalOpen(true)}>
+          {user?.permission?.includes("rencana-studi.page") && (
+            <Button onClick={openAddModal}>
               + Tambah Kelas
             </Button>
           )}
@@ -185,10 +213,8 @@ const RencanaStudi = () => {
       <ModalRencanaStudi
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onChange={handleChange}
         onSubmit={handleSubmit}
-        onChange={(e) =>
-          setForm({ ...form, [e.target.name]: e.target.value })
-        }
         form={form}
         dosen={dosen}
         mataKuliah={mataKuliahBelumAdaKelas}
