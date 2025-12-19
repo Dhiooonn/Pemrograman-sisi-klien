@@ -103,9 +103,7 @@ const RencanaStudi = () => {
       .reduce((a, b) => a + b, 0);
   };
 
-  // ======================
   // TAMBAH MAHASISWA KE KELAS
-  // ======================
   const handleAddMahasiswa = async (kelasItem, mhsId) => {
     try {
       if (!mhsId) {
@@ -155,65 +153,79 @@ const RencanaStudi = () => {
   };
 
   // HAPUS MAHASISWA DARI KELAS
-  const handleDeleteMahasiswa = async (kelasItem, mhsId) => {
-    const mhsIdNum = Number(mhsId);
+  const handleDeleteMahasiswa = (kelasItem, mhsId) => {
+    confirmDelete(async () => {
+      try {
+        const mhsIdNum = Number(mhsId);
 
-    await updateKelas(kelasItem.id, {
-      ...kelasItem,
-      mahasiswa_ids: kelasItem.mahasiswa_ids
-        .map(Number)
-        .filter((id) => id !== mhsIdNum),
+        await updateKelas(kelasItem.id, {
+          ...kelasItem,
+          mahasiswa_ids: kelasItem.mahasiswa_ids
+            .map(Number)
+            .filter((id) => id !== mhsIdNum),
+        });
+
+        toastSuccess("Mahasiswa berhasil dihapus dari kelas");
+        fetchData();
+      } catch (error) {
+        toastError("Gagal menghapus mahasiswa dari kelas");
+      }
     });
-
-    toastSuccess("Mahasiswa dihapus");
-    fetchData();
   };
 
-  // GANTI DOSEN
+  // ganti Dosen
   const handleChangeDosen = async (kelasItem) => {
-    const dsnId = selectedDsn[kelasItem.id];
+    try {
+      const dsnId = selectedDsn[kelasItem.id];
 
-    if (!dsnId) {
-      toastError("Pilih dosen terlebih dahulu");
-      return;
+      if (!dsnId) {
+        toastError("Pilih dosen terlebih dahulu");
+        return;
+      }
+
+      const dsnIdNum = Number(dsnId);
+
+      const sksKelas =
+        mataKuliah.find(
+          (m) => Number(m.id) === Number(kelasItem.mata_kuliah_id)
+        )?.sks || 0;
+
+      const totalSksDosen = kelas
+        .filter((k) => Number(k.dosen_id) === dsnIdNum)
+        .map(
+          (k) =>
+            mataKuliah.find(
+              (mk) => Number(mk.id) === Number(k.mata_kuliah_id)
+            )?.sks || 0
+        )
+        .reduce((a, b) => a + b, 0);
+
+      const maxSks = getMaxSksDosen(dsnIdNum);
+
+      if (totalSksDosen + sksKelas > maxSks) {
+        toastError(`Dosen melebihi batas maksimal SKS (${maxSks})`);
+        return;
+      }
+
+      await updateKelas(kelasItem.id, {
+        ...kelasItem,
+        dosen_id: dsnIdNum,
+      });
+
+      toastSuccess("Dosen berhasil diperbarui");
+
+      setSelectedDsn((prev) => ({
+        ...prev,
+        [kelasItem.id]: "",
+      }));
+
+      fetchData();
+    } catch (error) {
+      toastError("Gagal memperbarui dosen pengampu");
     }
-
-    const dsnIdNum = Number(dsnId);
-
-    const sksKelas =
-      mataKuliah.find(
-        (m) => Number(m.id) === Number(kelasItem.mata_kuliah_id)
-      )?.sks || 0;
-
-    const totalSksDosen = kelas
-      .filter((k) => Number(k.dosen_id) === dsnIdNum)
-      .map(
-        (k) =>
-          mataKuliah.find(
-            (mk) => Number(mk.id) === Number(k.mata_kuliah_id)
-          )?.sks || 0
-      )
-      .reduce((a, b) => a + b, 0);
-
-    const maxSks = getMaxSksDosen(dsnIdNum);
-
-    if (totalSksDosen + sksKelas > maxSks) {
-      toastError(`Dosen melebihi batas maksimal SKS (${maxSks})`);
-      return;
-    }
-
-    await updateKelas(kelasItem.id, {
-      ...kelasItem,
-      dosen_id: dsnIdNum,
-    });
-
-    toastSuccess("Dosen berhasil diperbarui");
-    fetchData();
   };
 
-  // ======================
   // DELETE KELAS
-  // ======================
   const handleDeleteKelas = (kelasId) => {
     confirmDelete(async () => {
       await deleteKelas(kelasId);
@@ -222,9 +234,7 @@ const RencanaStudi = () => {
     });
   };
 
-  // ======================
   // MODAL TAMBAH KELAS
-  // ======================
   const openAddModal = () => {
     setForm({ mata_kuliah_id: "", dosen_id: "" });
     setIsModalOpen(true);
@@ -254,9 +264,7 @@ const RencanaStudi = () => {
     fetchData();
   };
 
-  // ======================
-  // RENDER
-  // ======================
+  // Render
   return (
     <>
       <Card>

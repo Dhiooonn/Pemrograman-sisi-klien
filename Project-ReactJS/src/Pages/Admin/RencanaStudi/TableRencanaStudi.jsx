@@ -2,8 +2,9 @@ import React from "react";
 import Button from "@/Pages/Admin/Components/Button";
 import Select from "@/Pages/Admin/Components/Select";
 
-// --- Sub-Component: Avatar Kecil ---
+// Sub-Component: Avatar Kecil 
 const AvatarSmall = ({ name }) => {
+
   const initial = name ? name.charAt(0).toUpperCase() : "?";
   // Pilihan warna background avatar
   const colors = [
@@ -21,7 +22,7 @@ const AvatarSmall = ({ name }) => {
   );
 };
 
-// --- Main Component ---
+// Main Component 
 export default function TableRencanaStudi({
   kelas,
   mahasiswa,
@@ -39,6 +40,7 @@ export default function TableRencanaStudi({
 }) {
   return (
     <div className="space-y-8">
+
       {/* State: Jika data kelas kosong */}
       {kelas.length === 0 && (
         <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
@@ -84,7 +86,7 @@ export default function TableRencanaStudi({
                 </div>
               </div>
 
-              {/* Info Kanan: Ganti Dosen & Hapus Kelas */}
+              {/* Ganti Dosen & Hapus Kelas */}
               <div className="flex flex-col items-end gap-2 w-full md:w-auto">
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Select

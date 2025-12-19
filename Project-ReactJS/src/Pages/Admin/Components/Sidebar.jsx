@@ -1,13 +1,22 @@
 import { NavLink } from "react-router-dom";
 import { useAuthStateContext } from "../../Auth/Context/AuthContext";
 
+import {
+  HomeIcon,
+  AcademicCapIcon,
+  BookOpenIcon,
+} from "@heroicons/react/24/outline";
+
 
 const Sidebar = () => {
   const { user } = useAuthStateContext();
+
   const navClass = ({ isActive }) =>
     `flex items-center space-x-2 px-4 py-2 rounded ${
       isActive ? "bg-blue-700" : "hover:bg-blue-700"
     }`;
+
+    const iconClass = "w-5 h-5 flex-shrink-0";
   // console.log("User sidebar: ", user); // Debugging
 
   return (
@@ -25,7 +34,7 @@ const Sidebar = () => {
         {/* DASHBOARD */}
         {user?.permission?.includes("dashboard.page") && (
           <NavLink to="/admin/dashboard" className={navClass}>
-            <span>🏠</span>
+            <HomeIcon className={iconClass}/>
             <p className="menu-text hidden lg:inline">Dashboard</p>
           </NavLink>
         )}
@@ -33,7 +42,7 @@ const Sidebar = () => {
         {/* MAHASISWA */}
         {user?.permission?.includes("mahasiswa.page") && (
           <NavLink to="/admin/mahasiswa" className={navClass}>
-            <span>🎓</span>
+            <AcademicCapIcon className={iconClass} />
             <p className="menu-text hidden lg:inline">Mahasiswa</p>
           </NavLink>
         )}
@@ -41,7 +50,7 @@ const Sidebar = () => {
         {/* RENCANA STUDI */}
         {user?.permission?.includes("rencana-studi.page") && (
           <NavLink to="/admin/rencana-studi" className={navClass}>
-            <span>📚</span>
+            <BookOpenIcon className={iconClass} />
             <span className="menu-text hidden lg:inline">Rencana Studi</span>
           </NavLink>
         )}
