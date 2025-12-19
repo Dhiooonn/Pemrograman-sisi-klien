@@ -72,6 +72,18 @@ const ModalMahasiswa = ({
             />
           </div>
 
+          <div>
+            <Label htmlFor="nama"> Max SKS </Label>
+              <Input
+                type="number"
+                name="max_sks"
+                value={form.max_sks}
+                onChange={onChange}
+                placeholder="Masukkan Max SKS"
+                required
+              />
+          </div>
+
           {/* Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <Button

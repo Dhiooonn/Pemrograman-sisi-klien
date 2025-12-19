@@ -11,7 +11,7 @@ const Sidebar = () => {
   // console.log("User sidebar: ", user); // Debugging
 
   return (
-    <aside className="bg-blue-800 text-white min-h-screen transition-all duration-300 w-20 lg:w-64">
+    <aside className="fixed top-0 left-0 z-40 bg-blue-800 text-white min-h-screen transition-all duration-300 w-20 lg:w-64">
       <div className="p-4 border-b border-blue-700">
         <h3 className="text-2xl font-bold hidden lg:block">Admin</h3>
 

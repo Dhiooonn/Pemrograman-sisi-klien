@@ -4,18 +4,24 @@ import Header from "@/Pages/Admin/Components/Header";
 import Footer from "@/Pages/Admin/Components/Footer";
 import { Outlet } from "react-router-dom";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      <Sidebar />
-      <div className="flex flex-col flex-1">
-        <Header />
-        <main className="flex-1 p-6 overflow-x-auto">
-            <Outlet />
-        </main>
-        <Footer />
-      </div>
-    </div>
+    <>
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Content */}
+        <div className="ml-64 min-h-screen bg-gray-100 flex flex-col">
+          {/* Header */}
+          <Header />
+          
+          <main className="flex-1 p-6 overflow-x-auto">
+              <Outlet />
+          </main>
+
+          <Footer />
+        </div>
+    </>
   );
 };
 
