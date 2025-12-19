@@ -27,15 +27,22 @@ const Mahasiswa = () => {
   const navigate = useNavigate();
   const { user } = useAuthStateContext();
 
-  // State
+  // STATE
   const [mahasiswa, setMahasiswa] = useState([]);
   const [kelas, setKelas] = useState([]);
   const [mataKuliah, setMataKuliah] = useState([]);
 
+  // Pagination
   const [page, setPage] = useState(1);
   const limit = 5;
   const [totalPages, setTotalPages] = useState(1);
 
+  // 🔍 Search & Sort
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  // Form
   const [form, setForm] = useState({
     id: "",
     nim: "",
@@ -46,15 +53,21 @@ const Mahasiswa = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch Data
+  // FETCH
   useEffect(() => {
-    setTimeout(() => fetchData(), 500);
-  }, [page]);
+    fetchData();
+  }, [page, search, sortBy, sortOrder]);
 
   const fetchData = async () => {
     try {
       const [resMahasiswa, resKelas, resMataKuliah] = await Promise.all([
-        getAllMahasiswa({ _page: page, _limit: limit }),
+        getAllMahasiswa({
+          _page: page,
+          _limit: limit,
+          q: search,
+          _sort: sortBy,
+          _order: sortOrder,
+        }),
         getAllKelas(),
         getAllMataKuliah(),
       ]);
@@ -63,14 +76,14 @@ const Mahasiswa = () => {
       setKelas(resKelas.data);
       setMataKuliah(resMataKuliah.data);
 
-      const total = resMahasiswa.headers["x-total-count"]
-      setTotalPages(Math.ceil(total / limit))
+      const total = resMahasiswa.headers["x-total-count"];
+      setTotalPages(Math.ceil(total / limit));
     } catch (err) {
-      toastError("Gagal mengambil data");
+      toastError("Gagal mengambil data mahasiswa");
     }
   };
 
-  // Form
+  // FORM
   const resetForm = () => {
     setForm({ id: "", nim: "", name: "", max_sks: 0 });
     setIsEdit(false);
@@ -97,7 +110,7 @@ const Mahasiswa = () => {
     setIsModalOpen(true);
   };
 
-  // Submit
+  // SUBMIT
   const handleSubmit = async () => {
     if (!form.nim || !form.name || !form.max_sks) {
       toastError("NIM, Nama, dan Max SKS wajib diisi!");
@@ -112,12 +125,6 @@ const Mahasiswa = () => {
         resetForm();
       });
     } else {
-      const exists = mahasiswa.find((m) => m.nim === form.nim);
-      if (exists) {
-        toastError("NIM sudah terdaftar!");
-        return;
-      }
-
       await storeMahasiswa(form);
       toastSuccess("Data berhasil ditambahkan");
       fetchData();
@@ -125,8 +132,7 @@ const Mahasiswa = () => {
     }
   };
 
-
-  // Delete
+  // DELETE
   const handleDelete = (id) => {
     confirmDelete(async () => {
       await deleteMahasiswa(id);
@@ -135,7 +141,7 @@ const Mahasiswa = () => {
     });
   };
 
-  // Total Sks
+  // TOTAL SKS
   const getTotalSks = (mhsId) => {
     return kelas
       .filter((k) => (k.mahasiswa_ids || []).includes(mhsId))
@@ -148,7 +154,7 @@ const Mahasiswa = () => {
       .reduce((a, b) => a + b, 0);
   };
 
-  // Render
+  // RENDER
   return (
     <>
       <Card>
@@ -160,21 +166,55 @@ const Mahasiswa = () => {
           )}
         </div>
 
-        {user?.permission?.includes("mahasiswa.read") ? (
-          <TableMahasiswa
-            data={mahasiswa}
-            onEdit={openEditModal}
-            onDelete={handleDelete}
-            onDetail={(id) => navigate(`/admin/mahasiswa/${id}`)}
-            getTotalSks={getTotalSks}
+        {/* 🔍 SEARCH & SORT UI */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          <input
+            type="text"
+            placeholder="Cari nama / NIM..."
+            className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 px-3 py-1 rounded flex-grow"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
-        ) : (
-          <p className="text-sm text-gray-500">
-            Anda tidak memiliki izin melihat data mahasiswa.
-          </p>
-        )}
 
-        {/* UI Button Pagination */}
+          <select
+            value={sortBy}
+            onChange={(e) => {
+              setSortBy(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 px-3 py-1 rounded"
+          >
+            <option value="name">Sort by Nama</option>
+            <option value="nim">Sort by NIM</option>
+            <option value="max_sks">Sort by Max SKS</option>
+          </select>
+
+          <select
+            value={sortOrder}
+            onChange={(e) => {
+              setSortOrder(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 px-3 py-1 rounded"
+          >
+            <option value="asc">Asc</option>
+            <option value="desc">Desc</option>
+          </select>
+        </div>
+
+        {/* TABLE */}
+        <TableMahasiswa
+          data={mahasiswa}
+          onEdit={openEditModal}
+          onDelete={handleDelete}
+          onDetail={(id) => navigate(`/admin/mahasiswa/${id}`)}
+          getTotalSks={getTotalSks}
+        />
+
+        {/* PAGINATION */}
         <div className="flex justify-between items-center mt-4">
           <p className="text-sm text-gray-600">
             Halaman {page} dari {totalPages}
@@ -209,8 +249,6 @@ const Mahasiswa = () => {
         onChange={handleChange}
         onClose={resetForm}
         onSubmit={handleSubmit}
-        kelas={kelas}
-        mataKuliah={mataKuliah}
       />
     </>
   );
