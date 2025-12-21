@@ -3,8 +3,11 @@ import {
 } from "@/Utils/Helpers/SwalHelpers";
 import { useNavigate } from "react-router-dom";
 
-import Button from "@/Pages/Admin/Components/Button";
 import { useAuthStateContext } from "../../Auth/Context/AuthContext";
+
+import {
+  ArrowRightOnRectangleIcon
+} from "@heroicons/react/24/outline";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -24,14 +27,23 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="fixed top-0 left-0 right-0 ml-64 z-50 bg-white shadow-md ">
       <div className="flex justify-between items-center px-6 py-4">
         <h1 className="text-2xl font-semibold text-gray-800">Mahasiswa</h1>
         <div className="relative">
-          <Button
+          <button
             onClick={toggleProfileMenu}
-            className="w-8 h-8 rounded-full bg-gray-300 focus:outline-none"
-          />
+            className="
+              w-10 h-10 rounded-full 
+              bg-red-500 
+              flex items-center justify-center
+              hover:bg-red-600
+              focus:outline-none cursor-pointer
+            "
+          >
+            <ArrowRightOnRectangleIcon className="h-5 text-white" />
+          </button>
+
           <div
             id="profileMenu"
             className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-2 hidden"
