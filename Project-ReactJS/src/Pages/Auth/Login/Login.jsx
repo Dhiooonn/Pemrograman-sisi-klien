@@ -10,7 +10,7 @@ import Form from "@/Pages/Admin/Components/Form";
 import { toast } from "react-hot-toast";
 import { useNavigate, Navigate } from "react-router-dom";
 
-import { login } from "@/utils/Apis/AuthApi";
+import { login } from "@/Utils/Apis/AuthApi";
 import { useAuthStateContext } from "../Context/AuthContext";
 
 const Login = () => {
