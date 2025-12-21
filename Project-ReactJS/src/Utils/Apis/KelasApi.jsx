@@ -1,4 +1,4 @@
-import axios from "@/utils/AxiosInstance";
+import axios from "@/Utils/AxiosInstance";
 
 // Ambil semua kelas
 export const getAllKelas = () => axios.get("/kelas");
