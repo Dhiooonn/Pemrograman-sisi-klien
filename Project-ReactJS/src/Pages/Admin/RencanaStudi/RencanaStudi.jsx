@@ -25,11 +25,16 @@ import { getAllMahasiswa } from "@/Utils/Apis/MahasiswaApi";
 import { getAllMataKuliah } from "@/Utils/Apis/MataKuliahApi";
 
 const RencanaStudi = () => {
-  // ======================
-  // STATE & CONTEXT
-  // ======================
   const { user } = useAuthStateContext();
 
+  // ROLE & PERMISSION
+  const canCreate = user?.permission?.includes("rencana-studi.create");
+  const canUpdate = user?.permission?.includes("rencana-studi.update");
+  const canDelete = user?.permission?.includes("rencana-studi.delete");
+
+  const isReadOnly = !canUpdate; // mahasiswa = read only
+
+  // STATE
   const [kelas, setKelas] = useState([]);
   const [dosen, setDosen] = useState([]);
   const [mahasiswa, setMahasiswa] = useState([]);
@@ -45,54 +50,43 @@ const RencanaStudi = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // ======================
   // FETCH DATA
-  // ======================
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      const [
-        resKelas,
-        resDosen,
-        resMahasiswa,
-        resMataKuliah,
-      ] = await Promise.all([
-        getAllKelas(),
-        getAllDosen(),
-        getAllMahasiswa(),
-        getAllMataKuliah(),
-      ]);
+      const [resKelas, resDosen, resMahasiswa, resMataKuliah] =
+        await Promise.all([
+          getAllKelas(),
+          getAllDosen(),
+          getAllMahasiswa(),
+          getAllMataKuliah(),
+        ]);
 
       setKelas(resKelas.data);
       setDosen(resDosen.data);
       setMahasiswa(resMahasiswa.data);
       setMataKuliah(resMataKuliah.data);
-    } catch (err) {
+    } catch {
       toastError("Gagal mengambil data");
     }
   };
 
-  // ======================
   // HELPERS
-  // ======================
   const getMaxSksMahasiswa = (id) =>
     mahasiswa.find((m) => Number(m.id) === Number(id))?.max_sks || 0;
 
   const getMaxSksDosen = (id) =>
     dosen.find((d) => Number(d.id) === Number(id))?.max_sks || 0;
 
-  // 🔥 TOTAL SKS MAHASISWA (AMAN STRING / NUMBER)
   const getTotalSksMahasiswa = (mhsId) => {
-    const mhsIdNum = Number(mhsId);
+    const id = Number(mhsId);
 
     return kelas
       .filter((k) =>
-        (k.mahasiswa_ids || [])
-          .map(Number)
-          .includes(mhsIdNum)
+        (k.mahasiswa_ids || []).map(Number).includes(id)
       )
       .map(
         (k) =>
@@ -103,15 +97,20 @@ const RencanaStudi = () => {
       .reduce((a, b) => a + b, 0);
   };
 
-  // TAMBAH MAHASISWA KE KELAS
+  // TAMBAH MAHASISWA
   const handleAddMahasiswa = async (kelasItem, mhsId) => {
+    if (isReadOnly) {
+      toastError("Anda tidak memiliki izin");
+      return;
+    }
+
     try {
+      const mhsIdNum = Number(mhsId);
+
       if (!mhsId) {
         toastError("Pilih mahasiswa terlebih dahulu");
         return;
       }
-
-      const mhsIdNum = Number(mhsId);
 
       if (kelasItem.mahasiswa_ids.map(Number).includes(mhsIdNum)) {
         toastError("Mahasiswa sudah terdaftar");
@@ -123,11 +122,11 @@ const RencanaStudi = () => {
           (m) => Number(m.id) === Number(kelasItem.mata_kuliah_id)
         )?.sks || 0;
 
-      const totalSks = getTotalSksMahasiswa(mhsIdNum);
-      const maxSks = getMaxSksMahasiswa(mhsIdNum);
+      const total = getTotalSksMahasiswa(mhsIdNum);
+      const max = getMaxSksMahasiswa(mhsIdNum);
 
-      if (totalSks + sksMatkul > maxSks) {
-        toastError(`SKS melebihi batas maksimal (${maxSks})`);
+      if (total + sksMatkul > max) {
+        toastError(`SKS melebihi batas maksimal (${max})`);
         return;
       }
 
@@ -139,58 +138,60 @@ const RencanaStudi = () => {
         ],
       });
 
-      toastSuccess("Mahasiswa berhasil ditambahkan ke kelas");
-
-      setSelectedMhs((prev) => ({
-        ...prev,
-        [kelasItem.id]: "",
-      }));
-
+      toastSuccess("Mahasiswa berhasil ditambahkan");
       fetchData();
-    } catch (error) {
-      toastError("Gagal menambahkan mahasiswa ke kelas");
+    } catch {
+      toastError("Gagal menambahkan mahasiswa");
     }
   };
 
-  // HAPUS MAHASISWA DARI KELAS
+  // HAPUS MAHASISWA
   const handleDeleteMahasiswa = (kelasItem, mhsId) => {
+    if (isReadOnly) {
+      toastError("Anda tidak memiliki izin");
+      return;
+    }
+
     confirmDelete(async () => {
       try {
-        const mhsIdNum = Number(mhsId);
+        const id = Number(mhsId);
 
         await updateKelas(kelasItem.id, {
           ...kelasItem,
           mahasiswa_ids: kelasItem.mahasiswa_ids
             .map(Number)
-            .filter((id) => id !== mhsIdNum),
+            .filter((x) => x !== id),
         });
 
-        toastSuccess("Mahasiswa berhasil dihapus dari kelas");
+        toastSuccess("Mahasiswa berhasil dihapus");
         fetchData();
-      } catch (error) {
-        toastError("Gagal menghapus mahasiswa dari kelas");
+      } catch {
+        toastError("Gagal menghapus mahasiswa");
       }
     });
   };
 
-  // ganti Dosen
+  // GANTI DOSEN
   const handleChangeDosen = async (kelasItem) => {
-    try {
-      const dsnId = selectedDsn[kelasItem.id];
+    if (isReadOnly) {
+      toastError("Anda tidak memiliki izin");
+      return;
+    }
 
-      if (!dsnId) {
+    try {
+      const dsnIdNum = Number(selectedDsn[kelasItem.id]);
+
+      if (!dsnIdNum) {
         toastError("Pilih dosen terlebih dahulu");
         return;
       }
-
-      const dsnIdNum = Number(dsnId);
 
       const sksKelas =
         mataKuliah.find(
           (m) => Number(m.id) === Number(kelasItem.mata_kuliah_id)
         )?.sks || 0;
 
-      const totalSksDosen = kelas
+      const totalDosen = kelas
         .filter((k) => Number(k.dosen_id) === dsnIdNum)
         .map(
           (k) =>
@@ -200,10 +201,10 @@ const RencanaStudi = () => {
         )
         .reduce((a, b) => a + b, 0);
 
-      const maxSks = getMaxSksDosen(dsnIdNum);
+      const max = getMaxSksDosen(dsnIdNum);
 
-      if (totalSksDosen + sksKelas > maxSks) {
-        toastError(`Dosen melebihi batas maksimal SKS (${maxSks})`);
+      if (totalDosen + sksKelas > max) {
+        toastError(`Dosen melebihi batas maksimal (${max})`);
         return;
       }
 
@@ -213,20 +214,19 @@ const RencanaStudi = () => {
       });
 
       toastSuccess("Dosen berhasil diperbarui");
-
-      setSelectedDsn((prev) => ({
-        ...prev,
-        [kelasItem.id]: "",
-      }));
-
       fetchData();
-    } catch (error) {
-      toastError("Gagal memperbarui dosen pengampu");
+    } catch {
+      toastError("Gagal memperbarui dosen");
     }
   };
 
   // DELETE KELAS
   const handleDeleteKelas = (kelasId) => {
+    if (!canDelete) {
+      toastError("Anda tidak memiliki izin");
+      return;
+    }
+
     confirmDelete(async () => {
       await deleteKelas(kelasId);
       toastSuccess("Kelas berhasil dihapus");
@@ -234,8 +234,13 @@ const RencanaStudi = () => {
     });
   };
 
-  // MODAL TAMBAH KELAS
+  // TAMBAH KELAS
   const openAddModal = () => {
+    if (!canCreate) {
+      toastError("Anda tidak memiliki izin");
+      return;
+    }
+
     setForm({ mata_kuliah_id: "", dosen_id: "" });
     setIsModalOpen(true);
   };
@@ -247,6 +252,11 @@ const RencanaStudi = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!canCreate) {
+      toastError("Anda tidak memiliki izin");
+      return;
+    }
 
     if (!form.mata_kuliah_id || !form.dosen_id) {
       toastError("Mata kuliah dan dosen wajib dipilih");
@@ -264,14 +274,14 @@ const RencanaStudi = () => {
     fetchData();
   };
 
-  // Render
+  // RENDER
   return (
     <>
       <Card>
         <div className="flex justify-between items-center mb-4">
           <Heading as="h2">Rencana Studi</Heading>
 
-          {user?.permission?.includes("rencana-studi.page") && (
+          {canCreate && (
             <Button onClick={openAddModal}>
               + Tambah Kelas
             </Button>

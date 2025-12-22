@@ -2,7 +2,7 @@ import React from "react";
 import Button from "@/Pages/Admin/Components/Button";
 import Select from "@/Pages/Admin/Components/Select";
 
-// Sub-Component: Avatar Kecil 
+// Avatar Kecil 
 const AvatarSmall = ({ name }) => {
 
   const initial = name ? name.charAt(0).toUpperCase() : "?";
@@ -63,10 +63,10 @@ export default function TableRencanaStudi({
             key={kls.id} 
             className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md"
           >
-            {/* --- HEADER KELAS (Gradient Background) --- */}
+            {/* HEADER */}
             <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex flex-col md:flex-row md:items-start md:justify-between gap-4">
               
-              {/* Info Kiri: Matkul & Dosen */}
+              {/* Matkul & Dosen */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-blue-100 text-blue-700">
@@ -113,7 +113,7 @@ export default function TableRencanaStudi({
                   </Button>
                 </div>
 
-                {/* Tombol Hapus Kelas (Hanya muncul jika kelas kosong) */}
+                {/* button Hapus Kelas (Hanya muncul jika kelas kosong) */}
                 {mhsInClass.length === 0 && (
                    <button
                    onClick={() => handleDeleteKelas(kls.id)}
@@ -169,7 +169,6 @@ export default function TableRencanaStudi({
                               </span>
                             </td>
                             <td className="py-3 px-5 text-right">
-                              {/* 🔴 TOMBOL HAPUS (MERAH) 🔴 */}
                               <button
                                 onClick={() => handleDeleteMahasiswa(kls, m.id)}
                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-md transition-all"
@@ -193,7 +192,7 @@ export default function TableRencanaStudi({
               </div>
             </div>
 
-            {/* --- FOOTER (Form Tambah Mahasiswa) --- */}
+            {/* --- FOOTER  --- */}
             <div className="bg-gray-50 px-5 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center gap-3">
               <div className="text-xs font-medium text-gray-500 whitespace-nowrap">
                 Tambah Mahasiswa ke Kelas:

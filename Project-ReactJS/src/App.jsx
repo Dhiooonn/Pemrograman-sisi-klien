@@ -7,6 +7,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Pages
 import Home from "./Pages/Home";
 import Login from "./Pages/Auth/Login/Login.jsx";
 import Dashboard from "./Pages/Admin/Dashboard/Dashboard";
@@ -14,10 +15,11 @@ import PageNotFound from "./Pages/Error/PageNotFound";
 import AuthLayout from "./Pages/Auth/AuthLayout";
 import AdminLayout from "./Pages/Admin/AdminLayout";
 import Mahasiswa from "./Pages/Admin/Mahasiswa/Mahasiswa.jsx";
+import RencanaStudi from "./Pages/Admin/RencanaStudi/RencanaStudi.jsx";
 import MahasiswaDetail from "./Pages/Admin/MahasiswaDetail/MahasiswaDetail.jsx";
+
 import ProtectedRoute from "./Pages/Admin/Components/ProtectedRoute.jsx";
 import { AuthProvider } from "./Pages/Auth/Context/AuthContext.jsx";
-import RencanaStudi from "./Pages/Admin/RencanaStudi/RencanaStudi.jsx";
 
 // React Query Client
 const queryClient = new QueryClient({
@@ -59,7 +61,7 @@ const router = createBrowserRouter([
       {
         path: "rencana-studi",
         element: <RencanaStudi/>
-      }
+      },
     ],
   },
   { path: "*", element: <PageNotFound /> },
